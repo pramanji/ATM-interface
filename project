@@ -1,0 +1,146 @@
+class ATM:
+    def __init__(self, account_number, pin, balance):
+        self.account_number = account_number
+        self.pin = pin
+        self.balance = balance
+
+    def check_balance(self):
+        print(f"\nYour current balance is: ₹{self.balance:.2f}")
+
+    def withdraw_cash(self):
+        try:
+            # Get the withdrawal amount
+            amount = int(input("\nEnter amount to withdraw (multiples of 100, 200, or 500): "))
+            
+            # Validate the input
+            if amount <= 0:
+                print("Invalid amount. Please enter a positive value.")
+            elif amount % 100 != 0 or amount < 100:
+                print("Invalid amount. Only multiples of 100, 200, or 500 are allowed.")
+            elif amount > self.balance:
+                print("Insufficient funds!")
+            else:
+                # Calculate the denominations
+                denominations = [500, 200, 100]
+                note_count = {}
+                remaining_amount = amount
+
+                for denomination in denominations:
+                    count = remaining_amount // denomination
+                    if count > 0:
+                        note_count[denomination] = count
+                        remaining_amount -= count * denomination
+
+                # Update the balance
+                self.balance -= amount
+                
+                # Display the result
+                print(f"\nWithdrawal successful! You have withdrawn ₹{amount}.")
+                print("Denominations dispensed:")
+                for denom, count in note_count.items():
+                    print(f"₹{denom}: {count} notes")
+                print(f"Your new balance is: ₹{self.balance:.2f}")
+        except ValueError:
+            print("Invalid input. Please enter a numeric value.")
+
+    def deposit_funds(self):
+        try:
+            amount = float(input("\nEnter amount to deposit: "))
+            if amount <= 0:
+                print("Invalid amount. Please enter a positive value.")
+            else:
+                self.balance += amount
+                print(f"Deposit successful! Your new balance is: ₹{self.balance:.2f}")
+        except ValueError:
+            print("Invalid input. Please enter a numeric value.")
+
+    def transfer_funds(self):
+        try:
+            recipient_account = input("\nEnter recipient account number: ")
+            if recipient_account == self.account_number:
+                print("You cannot transfer money to your own account!")
+                return
+            
+            amount = float(input("Enter amount to transfer: "))
+            if amount > self.balance:
+                print("Insufficient funds!")
+            elif amount <= 0:
+                print("Invalid amount. Please enter a positive value.")
+            else:
+                self.balance -= amount
+                print(f"Transfer successful! ₹{amount:.2f} has been sent to account {recipient_account}.")
+                print(f"Your new balance is: ₹{self.balance:.2f}")
+        except ValueError:
+            print("Invalid input. Please enter a numeric value.")
+
+    def change_pin(self):
+        current_pin = input("\nEnter your current PIN: ")
+        if current_pin != self.pin:
+            print("Incorrect PIN!")
+        else:
+            new_pin = input("Enter your new PIN: ")
+            confirm_pin = input("Re-enter your new PIN: ")
+            if new_pin == confirm_pin:
+                self.pin = new_pin
+                print("PIN change successful!")
+            else:
+                print("PINs do not match! Please try again.")
+
+    def main_menu(self):
+        while True:
+            print("\nMain Menu:")
+            print("1. Check Balance")
+            print("2. Withdraw Cash")
+            print("3. Deposit Funds")
+            print("4. Transfer Funds")
+            print("5. Change PIN")
+            print("6. Exit")
+            choice = input("\nPlease select an option: ")
+
+            if choice == "1":
+                self.check_balance()
+            elif choice == "2":
+                self.withdraw_cash()
+            elif choice == "3":
+                self.deposit_funds()
+            elif choice == "4":
+                self.transfer_funds()
+            elif choice == "5":
+                self.change_pin()
+            elif choice == "6":
+                print("Thank you for using the ATM. Goodbye!")
+                break
+            else:
+                print("Invalid option! Please try again.")
+
+
+# Main Program
+def main():
+    print("Welcome to ABC Bank ATM")
+
+    # Sample user account for demonstration
+    account = ATM(account_number="123456789", pin="1234", balance=1000.00)
+
+    # Authenticate user
+    entered_account = input("Please enter your account number: ")
+
+    if entered_account == account.account_number:
+        for attempt in range(3):
+            entered_pin = input("Enter your 4-digit PIN: ")
+            if entered_pin == account.pin:
+                print("\nLogin successful!")
+                account.main_menu()
+                break
+            else:
+                print("Incorrect PIN!")
+                if attempt == 2:
+                    print("Too many incorrect attempts. Card blocked!")
+                    return
+    else:
+        print("Invalid account number!")
+        return
+
+
+# Start the program
+if __name__ == "__main__":
+    main()
